@@ -1,3 +1,8 @@
+---
+title: "Heart Data"
+author: "Chris Addy"
+---   
+
     library(data.table)
 
     #heart <- fread("curl ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2015/personsx.zip | funzip")
