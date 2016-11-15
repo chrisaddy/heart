@@ -1,11 +1,16 @@
 ---
-title: "Heart Stuff"
+title: "Heart Data"
 author: "Chris Addy"
 ---
 
     library(data.table)
 
     heart <- fread("curl ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2015/personsx.zip | funzip")
+
+    ## 
+    Read 96.3% of 103789 rows
+    Read 103789 rows and 606 (of 606) columns from 0.075 GB file in 00:00:03
+
     dim(heart)
 
     ## [1] 103789    606
