@@ -9,7 +9,7 @@ library(data.table)
 ```
 
 ```{r}
-#heart <- fread("curl ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2015/personsx.zip | funzip")
+heart <- fread("curl ftp://ftp.cdc.gov/pub/Health_Statistics/NCHS/Datasets/NHIS/2015/personsx.zip | funzip")
 dim(heart)
 
 ### 606 variables, drop many
