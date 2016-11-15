@@ -129,49 +129,149 @@ dim(heart)</code></pre>
 <pre class="r"><code>### 606 variables, drop many
 
 heart_cleaned &lt;- as_data_frame(heart) %&gt;%
-    select(SEX, AGE_P, R_MARITL, MRACRPI2, EDUC1, DOINGLWP, ERNYR_P, COVER, COVER65)
+    select(SEX, AGE_P, R_MARITL, MRACRPI2, EDUC1, DOINGLWP, ERNYR_P, COVER, COVER65, HISPAN_I)
 
 ### create tables for codes to join
 
 sex_table &lt;- data_frame(SEX = c(1, 2), sex = c(&quot;male&quot;, &quot;female&quot;))
 
-marital_table &lt;- data_frame(R_MARITL = c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), marital = c(&quot;Under 14 years&quot;, &quot;Married - spouse in household&quot;, &quot;Married - spouse not in household&quot;, &quot;Married - spouse in household unknown&quot;, &quot;Widowed&quot;, &quot;Divorced&quot;, &quot;Separated&quot;, &quot;Never married&quot;, &quot;Living with partner&quot;, &quot;Unknown marital status&quot;))
+marital_table &lt;- data_frame(R_MARITL = c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+                            marital = c(&quot;Under 14 years&quot;,
+                                        &quot;Married - S&quot;, ## SPOUSE IN HOUSEHOLD
+                                        &quot;Married - NS&quot;, ## SPOUSE NOT IN HOUSEHOLD
+                                        &quot;Married - SU&quot;, ## SPOUSE IN HOUSEHOLD UNKNOWN
+                                        &quot;Widowed&quot;,
+                                        &quot;Divorced&quot;,
+                                        &quot;Separated&quot;,
+                                        &quot;Never married&quot;,
+                                        &quot;Living with partner&quot;,
+                                        &quot;Unknown marital status&quot;))
 
-race_table &lt;- data_frame(MRACRPI2 = c(1, 2, 3, 6, 7, 12, 16, 17), race = c(&quot;White&quot;, &quot;Black/African American&quot;, &quot;Indian (American) (includes Eskimo, Aleut)&quot;, &quot;Chinese&quot;, &quot;Filipino&quot;, &quot;Asian Indian&quot;, &quot;Other race*&quot;, &quot;Multiple race, no primary race selected&quot;))
+race_table &lt;- data_frame(MRACRPI2 = c(1, 2, 3, 6, 7, 12, 16, 17),
+                         race = c(&quot;White&quot;,
+                                  &quot;Black/AA&quot;,
+                                  &quot;Indian (American)&quot;, ### includes Eskimo, Aleut
+                                  &quot;Chinese&quot;,
+                                  &quot;Filipino&quot;,
+                                  &quot;Asian Indian&quot;,
+                                  &quot;Other race*&quot;,
+                                  &quot;Multiple race, no primary race selected&quot;))
 
-education_table &lt;- data_frame(c(0:21, 96:99), c(&quot;Never attended/kindergarten only&quot;, &quot;1st grade&quot;, &quot;2nd grade&quot;, &quot;3rd grade&quot;, &quot;4th grade&quot;, &quot;5th grade&quot;, &quot;6th grade&quot;, &quot;7th grade&quot;, &quot;8th grade&quot;, &quot;9th grade&quot;, &quot;10th grade&quot;, &quot;11th grade&quot;, &quot;12th grade, no diploma&quot;, &quot;GED or equivalent&quot;, &quot;High School Graduate&quot;, &quot;Some college, no degree&quot;, &quot;Associate degree: occupational, technical, or vocational program&quot;, &quot;Associate degree: academic program&quot;, &quot;Bachelor's degree (Example: BA, AB, BS, BBA)&quot;, &quot;Master's degree (Example: MA, MS, MEng, MEd, MBA)&quot;, &quot;Professional School degree (Example: MD, DDS, DVM, JD)&quot;, &quot;Doctoral degree (Example: PhD, EdD)&quot;, &quot;Child under 5 years old&quot;, &quot;Refused&quot;, &quot;Not ascertained&quot;, &quot;Don't know&quot;))
+education_table &lt;- data_frame(EDUC1 = c(0:21, 96:99),
+                              education = c(&quot;NA/KO&quot;, ###Never Attended/Kindergarten Only
+                                            &quot;1st grade&quot;,
+                                            &quot;2nd grade&quot;,
+                                            &quot;3rd grade&quot;,
+                                            &quot;4th grade&quot;,
+                                            &quot;5th grade&quot;,
+                                            &quot;6th grade&quot;,
+                                            &quot;7th grade&quot;,
+                                            &quot;8th grade&quot;,
+                                            &quot;9th grade&quot;,
+                                            &quot;10th grade&quot;,
+                                            &quot;11th grade&quot;,
+                                            &quot;12th grade, ND&quot;, ## No diploma
+                                            &quot;GED&quot;, ### or equivalent
+                                            &quot;HSG&quot;, ### HIGH SCHOOL GRADUATE
+                                            &quot;SCND&quot;, ### Some college, no degree
+                                            &quot;Associate: OTV&quot;, ### occupational, technical, or vocational program&quot;
+                                            &quot;Associate: ACA&quot;, ### academic program&quot;,
+                                            &quot;Bachelor's&quot;, #### Example: BA, AB, BS, BBA
+                                            &quot;Master's&quot;, ### Example: MA, MS, MEng, MEd, MBA
+                                            &quot;Professional&quot;, ### Example: MD, DDS, DVM, JD
+                                            &quot;Doctoral&quot;, ### Example: PhD, EdD
+                                            &quot;&lt; 5 years old&quot;,
+                                            &quot;Refused&quot;,
+                                            &quot;Not ascertained&quot;,
+                                            &quot;Don't know&quot;))
 
-earnings_table &lt;- data_frame(ERNYR_P = c(1:11, 97:99), earnings = c(&quot;$01-$4,999&quot;, &quot;$5,000-$9,999&quot;, &quot;$10,000-$14,999&quot;, &quot;$15,000-$19,999&quot;, &quot;$20,000-$24,999&quot;, &quot;$25,000-$34,999&quot;, &quot;$35,000-$44,999&quot;, &quot;$45,000-$54,999&quot;, &quot;$55,000-$64,999&quot;, &quot;$65,000-$74,999&quot;, &quot;$75,000 and over&quot;, &quot;Refused&quot;, &quot;Not ascertained&quot;, &quot;Don't know&quot;))
+earnings_table &lt;- data_frame(ERNYR_P = c(1:11, 97:99),
+                             earnings = c(&quot;$01-$4,999&quot;,
+                                          &quot;$5,000-$9,999&quot;,
+                                          &quot;$10,000-$14,999&quot;,
+                                          &quot;$15,000-$19,999&quot;,
+                                          &quot;$20,000-$24,999&quot;,
+                                          &quot;$25,000-$34,999&quot;,
+                                          &quot;$35,000-$44,999&quot;,
+                                          &quot;$45,000-$54,999&quot;,
+                                          &quot;$55,000-$64,999&quot;,
+                                          &quot;$65,000-$74,999&quot;,
+                                          &quot;$75,000 and over&quot;,
+                                          &quot;Refused&quot;,
+                                          &quot;Not ascertained&quot;,
+                                          &quot;Don't know&quot;))
 
-insurance &lt;- data_frame(c(1:5), c(&quot;Private&quot;, &quot;Medicaid and other public&quot;, &quot;Other coverage&quot;, &quot;Uninsured&quot;, &quot;Don't know&quot;))
+insurance_table &lt;- data_frame(COVER = c(1:5),
+                              insurance = c(&quot;Private&quot;,
+                                            &quot;Medicaid and other public&quot;,
+                                            &quot;Other coverage&quot;,
+                                            &quot;Uninsured&quot;, 
+                                            &quot;Don't know&quot;))
 
-insurance_65 &lt;- data_frame(c(1:7), c(&quot;Private&quot;, &quot;Dual eligible&quot;, &quot;Medicare Advantage&quot;, &quot;Medicare only excluding Medicare Advantage&quot;, &quot;Other coverage&quot;, &quot;Uninsured&quot;, &quot;Don't know&quot;))
+insurance_65_table &lt;- data_frame(COVER65 = c(1:7),
+                                 insurance_65 = c(&quot;Private&quot;,
+                                                  &quot;Dual eligible&quot;,
+                                                  &quot;Medicare Advantage&quot;,
+                                                  &quot;Medicare only excluding Medicare Advantage&quot;,
+                                                  &quot;Other coverage&quot;,
+                                                  &quot;Uninsured&quot;,
+                                                  &quot;Don't know&quot;))
+
+employment_table &lt;- data_frame(DOINGLWP = c(1:5, 7:9),
+                               employment = c(&quot;Working for pay at a job or business&quot;,
+                                              &quot;With a job or business but not at work&quot;,
+                                              &quot;Looking for work&quot;,
+                                              &quot;Working, but not for pay, at a family-owned job or business&quot;,
+                                              &quot;Not working at a job or business and not looking for work&quot;,
+                                              &quot;Refused&quot;,
+                                              &quot;Not ascertained&quot;,
+                                              &quot;Don't know&quot;))
+
+hispanic_table &lt;- data_frame(HISPAN_I = 0:12,
+                             hispanic = c(&quot;Multiple Hispanic&quot;,
+                               &quot;Puerto Rico&quot;,
+                               &quot;Mexican&quot;,
+                               &quot;Mexican-American&quot;,
+                               &quot;Cuban/Cuban American&quot;,
+                               &quot;Dominican (Republic)&quot;,
+                               &quot;Central or South American&quot;,
+                               &quot;Other Latin American, type not specified&quot;,
+                               &quot;Other Spanish&quot;,
+                               &quot;Hispanic/Latino/Spanish, non-specific type&quot;,
+                               &quot;Hispanic/Latino/Spanish, type refused&quot;,
+                               &quot;Hispanic/Latino/Spanish, type not ascertained&quot;,
+                               &quot;Not Hispanic/Spanish origin&quot;))
 
 heart_cleaned &lt;- heart_cleaned %&gt;%
-    inner_join(sex_table, by = &quot;SEX&quot;) %&gt;%
-    inner_join(marital_table, by = &quot;R_MARITL&quot;) %&gt;%
-    inner_join(race_table, by = &quot;MRACRPI2&quot;) %&gt;%
-    inner_join(earnings_table, by = &quot;ERNYR_P&quot; )
+    full_join(sex_table, by = &quot;SEX&quot;) %&gt;%
+    full_join(marital_table, by = &quot;R_MARITL&quot;) %&gt;%
+    full_join(race_table, by = &quot;MRACRPI2&quot;) %&gt;%
+    full_join(hispanic_table, by = &quot;HISPAN_I&quot;) %&gt;%
+    full_join(education_table, by = &quot;EDUC1&quot;) %&gt;%
+    full_join(employment_table, by = &quot;DOINGLWP&quot;) %&gt;%
+    full_join(earnings_table, by = &quot;ERNYR_P&quot; ) %&gt;%
+    full_join(insurance_table, by = &quot;COVER&quot;) %&gt;%
+    full_join(insurance_65_table, by = &quot;COVER65&quot;)
 
 heart_cleaned &lt;- heart_cleaned %&gt;%
-    select(-SEX, -R_MARITL, -MRACRPI2, -ERNYR_P)
+    select(-SEX, -R_MARITL, -MRACRPI2, -ERNYR_P, -COVER, -COVER65, -EDUC1, -DOINGLWP, -HISPAN_I)
 
 heart_cleaned</code></pre>
-<pre><code>## # A tibble: 47,283 × 9
-##    AGE_P EDUC1 DOINGLWP COVER COVER65    sex                       marital
-##    &lt;int&gt; &lt;int&gt;    &lt;int&gt; &lt;int&gt;   &lt;int&gt;  &lt;chr&gt;                         &lt;chr&gt;
-## 1     25    16        1     1      NA   male                 Never married
-## 2     31    14        1     1      NA female Married - spouse in household
-## 3     32    18        1     1      NA   male Married - spouse in household
-## 4     49    19        1     1      NA female                 Never married
-## 5     48    14        1     1      NA female Married - spouse in household
-## 6     49    14        1     1      NA   male Married - spouse in household
-## 7     53    17        1     1      NA   male                      Divorced
-## 8     66    12        1    NA       1 female                       Widowed
-## 9     34    18        1     1      NA   male Married - spouse in household
-## 10    31    18        1     1      NA female Married - spouse in household
-## # ... with 47,273 more rows, and 2 more variables: race &lt;chr&gt;,
-## #   earnings &lt;chr&gt;</code></pre>
+<pre><code>## # A tibble: 103,796 × 10
+##    AGE_P    sex        marital     race                    hispanic
+##    &lt;int&gt;  &lt;chr&gt;          &lt;chr&gt;    &lt;chr&gt;                       &lt;chr&gt;
+## 1     25   male  Never married    White Not Hispanic/Spanish origin
+## 2     31 female    Married - S    White Not Hispanic/Spanish origin
+## 3     32   male    Married - S    White Not Hispanic/Spanish origin
+## 4      8   male Under 14 years    White Not Hispanic/Spanish origin
+## 5      2 female Under 14 years    White Not Hispanic/Spanish origin
+## 6     49 female  Never married    White Not Hispanic/Spanish origin
+## 7     48 female    Married - S    White Not Hispanic/Spanish origin
+## 8     49   male    Married - S    White Not Hispanic/Spanish origin
+## 9     61   male  Never married     &lt;NA&gt; Not Hispanic/Spanish origin
+## 10    53   male       Divorced Black/AA Not Hispanic/Spanish origin
+## # ... with 103,786 more rows, and 5 more variables: education &lt;chr&gt;,
+## #   employment &lt;chr&gt;, earnings &lt;chr&gt;, insurance &lt;chr&gt;, insurance_65 &lt;chr&gt;</code></pre>
 
 
 

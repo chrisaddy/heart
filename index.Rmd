@@ -15,32 +15,132 @@ dim(heart)
 ### 606 variables, drop many
 
 heart_cleaned <- as_data_frame(heart) %>%
-	select(SEX, AGE_P, R_MARITL, MRACRPI2, EDUC1, DOINGLWP, ERNYR_P, COVER, COVER65)
+	select(SEX, AGE_P, R_MARITL, MRACRPI2, EDUC1, DOINGLWP, ERNYR_P, COVER, COVER65, HISPAN_I)
 
 ### create tables for codes to join
 
 sex_table <- data_frame(SEX = c(1, 2), sex = c("male", "female"))
 
-marital_table <- data_frame(R_MARITL = c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9), marital = c("Under 14 years", "Married - spouse in household", "Married - spouse not in household", "Married - spouse in household unknown", "Widowed", "Divorced", "Separated", "Never married", "Living with partner", "Unknown marital status"))
+marital_table <- data_frame(R_MARITL = c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9),
+						    marital = c("Under 14 years",
+						    			"Married - S", ## SPOUSE IN HOUSEHOLD
+						    			"Married - NS", ## SPOUSE NOT IN HOUSEHOLD
+						    			"Married - SU", ## SPOUSE IN HOUSEHOLD UNKNOWN
+						    			"Widowed",
+						    			"Divorced",
+						    			"Separated",
+						    			"Never married",
+						    			"Living with partner",
+						    			"Unknown marital status"))
 
-race_table <- data_frame(MRACRPI2 = c(1, 2, 3, 6, 7, 12, 16, 17), race = c("White", "Black/African American", "Indian (American) (includes Eskimo, Aleut)", "Chinese", "Filipino", "Asian Indian", "Other race*", "Multiple race, no primary race selected"))
+race_table <- data_frame(MRACRPI2 = c(1, 2, 3, 6, 7, 12, 16, 17),
+						 race = c("White",
+						 		  "Black/AA",
+						 		  "Indian (American)", ### includes Eskimo, Aleut
+						 		  "Chinese",
+						 		  "Filipino",
+						 		  "Asian Indian",
+						 		  "Other race*",
+						 		  "Multiple race, no primary race selected"))
 
-education_table <- data_frame(c(0:21, 96:99), c("Never attended/kindergarten only", "1st grade", "2nd grade", "3rd grade", "4th grade", "5th grade", "6th grade", "7th grade", "8th grade", "9th grade", "10th grade", "11th grade", "12th grade, no diploma", "GED or equivalent", "High School Graduate", "Some college, no degree", "Associate degree: occupational, technical, or vocational program", "Associate degree: academic program", "Bachelor's degree (Example: BA, AB, BS, BBA)", "Master's degree (Example: MA, MS, MEng, MEd, MBA)", "Professional School degree (Example: MD, DDS, DVM, JD)", "Doctoral degree (Example: PhD, EdD)", "Child under 5 years old", "Refused", "Not ascertained", "Don't know"))
+education_table <- data_frame(EDUC1 = c(0:21, 96:99),
+							  education = c("NA/KO", ###Never Attended/Kindergarten Only
+							  			    "1st grade",
+							  			    "2nd grade",
+							  			    "3rd grade",
+							  			    "4th grade",
+							  			    "5th grade",
+							  			    "6th grade",
+							  			    "7th grade",
+							  			    "8th grade",
+							  			    "9th grade",
+							  			    "10th grade",
+							  			    "11th grade",
+							  			    "12th grade, ND", ## No diploma
+							  			    "GED", ### or equivalent
+							  			    "HSG", ### HIGH SCHOOL GRADUATE
+							  			    "SCND", ### Some college, no degree
+							  			    "Associate: OTV", ### occupational, technical, or vocational program"
+							  			    "Associate: ACA", ### academic program",
+							  			    "Bachelor's", #### Example: BA, AB, BS, BBA
+							  			    "Master's", ### Example: MA, MS, MEng, MEd, MBA
+							  			    "Professional", ### Example: MD, DDS, DVM, JD
+							  			    "Doctoral", ### Example: PhD, EdD
+							  			    "< 5 years old",
+							  			    "Refused",
+							  			    "Not ascertained",
+							  			    "Don't know"))
 
-earnings_table <- data_frame(ERNYR_P = c(1:11, 97:99), earnings = c("$01-$4,999", "$5,000-$9,999", "$10,000-$14,999", "$15,000-$19,999", "$20,000-$24,999", "$25,000-$34,999", "$35,000-$44,999", "$45,000-$54,999", "$55,000-$64,999", "$65,000-$74,999", "$75,000 and over", "Refused", "Not ascertained", "Don't know"))
+earnings_table <- data_frame(ERNYR_P = c(1:11, 97:99),
+							 earnings = c("$01-$4,999",
+							              "$5,000-$9,999",
+							              "$10,000-$14,999",
+							              "$15,000-$19,999",
+							              "$20,000-$24,999",
+							              "$25,000-$34,999",
+							              "$35,000-$44,999",
+							              "$45,000-$54,999",
+							              "$55,000-$64,999",
+							              "$65,000-$74,999",
+							              "$75,000 and over",
+							              "Refused",
+							              "Not ascertained",
+							              "Don't know"))
 
-insurance <- data_frame(c(1:5), c("Private", "Medicaid and other public", "Other coverage", "Uninsured", "Don't know"))
+insurance_table <- data_frame(COVER = c(1:5),
+							  insurance = c("Private",
+							  				"Medicaid and other public",
+							  				"Other coverage",
+							  				"Uninsured", 
+							  				"Don't know"))
 
-insurance_65 <- data_frame(c(1:7), c("Private", "Dual eligible", "Medicare Advantage", "Medicare only excluding Medicare Advantage", "Other coverage", "Uninsured", "Don't know"))
+insurance_65_table <- data_frame(COVER65 = c(1:7),
+								 insurance_65 = c("Private",
+								 				  "Dual eligible",
+								 				  "Medicare Advantage",
+								 				  "Medicare only excluding Medicare Advantage",
+								 				  "Other coverage",
+								 				  "Uninsured",
+								 				  "Don't know"))
+
+employment_table <- data_frame(DOINGLWP = c(1:5, 7:9),
+							   employment = c("Working for pay at a job or business",
+								 	          "With a job or business but not at work",
+								 	          "Looking for work",
+								 	          "Working, but not for pay, at a family-owned job or business",
+								 	          "Not working at a job or business and not looking for work",
+								 	          "Refused",
+								 	          "Not ascertained",
+								 	          "Don't know"))
+
+hispanic_table <- data_frame(HISPAN_I = 0:12,
+							 hispanic = c("Multiple Hispanic",
+							   "Puerto Rico",
+							   "Mexican",
+							   "Mexican-American",
+							   "Cuban/Cuban American",
+							   "Dominican (Republic)",
+							   "Central or South American",
+							   "Other Latin American, type not specified",
+							   "Other Spanish",
+							   "Hispanic/Latino/Spanish, non-specific type",
+							   "Hispanic/Latino/Spanish, type refused",
+							   "Hispanic/Latino/Spanish, type not ascertained",
+							   "Not Hispanic/Spanish origin"))
 
 heart_cleaned <- heart_cleaned %>%
-	inner_join(sex_table, by = "SEX") %>%
-	inner_join(marital_table, by = "R_MARITL") %>%
-	inner_join(race_table, by = "MRACRPI2") %>%
-	inner_join(earnings_table, by = "ERNYR_P" )
+	full_join(sex_table, by = "SEX") %>%
+	full_join(marital_table, by = "R_MARITL") %>%
+	full_join(race_table, by = "MRACRPI2") %>%
+	full_join(hispanic_table, by = "HISPAN_I") %>%
+	full_join(education_table, by = "EDUC1") %>%
+	full_join(employment_table, by = "DOINGLWP") %>%
+	full_join(earnings_table, by = "ERNYR_P" ) %>%
+	full_join(insurance_table, by = "COVER") %>%
+	full_join(insurance_65_table, by = "COVER65")
 
 heart_cleaned <- heart_cleaned %>%
-	select(-SEX, -R_MARITL, -MRACRPI2, -ERNYR_P)
+	select(-SEX, -R_MARITL, -MRACRPI2, -ERNYR_P, -COVER, -COVER65, -EDUC1, -DOINGLWP, -HISPAN_I)
 
 heart_cleaned
 ```
