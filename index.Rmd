@@ -39,6 +39,9 @@ heart_cleaned <- heart_cleaned %>%
 	inner_join(race_table, by = "MRACRPI2") %>%
 	inner_join(earnings_table, by = "ERNYR_P" )
 
+heart_cleaned <- heart_cleaned %>%
+	select(-SEX, -R_MARITL, -MRACRPI2, -ERNYR_P)
+
 heart_cleaned
 ```
 
