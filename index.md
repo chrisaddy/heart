@@ -7,6 +7,7 @@
 ---
 title: "Heart Data"
 author: "Chris Addy"
+output: md_document
 ---
     
     ### 606 variables, drop many
